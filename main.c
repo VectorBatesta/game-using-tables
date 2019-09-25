@@ -3,36 +3,58 @@
 
 #define U_16 0x20000  //U-16 text mode, for the text blocks -> ignorar isso, serve apenas caso tenha caractere especial
 
-int checkmovable(char dir, char **table, int coordx, int coordy){ //portas lógicas para movimentação: para cima, para baixo, etc
+int checkmovable(char dir, char table[20][40], int antesx, int antesy){ //portas lógicas para movimentação: para cima, para baixo, etc
+    int depoisx;
+    int depoisy;
+    int moveu = 0;
+
     switch(dir){
         case 'c':
-            printf("cccccccccccccccc");
-            if(table[coordy - 1][coordx] == 'X' || table[coordy - 1][coordx] == 'K') //|| quer dizer OU, se quiser dizer E, só colocar && (...) se o player tentar mecher o personagem para um bloco[K] ou parede[X], a função retorna negativo
-                return 0; // : não consegue se mecher
-            else return 1; // : consegue se mecher
+                        printf("cccccccccccccccc");
+            depoisx = antesx;
+            depoisy = antesy - 1;
+                        printf("cccccccccccccccc");
+            if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K'){ //|| quer dizer OU, se quiser dizer E, só colocar && (...) se o player tentar mecher o personagem para um bloco[K] ou parede[X], a função retorna negativo
+                return 0;
+                printf("cccccccccccccccc"); //nao consegue se mover
+            }
+            else moveu = 1;
+                        printf("cccccccccccccccc");
             break;
         case 'e':
                         printf("eeeeeeeeeeeeeeeee");
-            if(table[coordy][coordx - 1] == 'X' || table[coordy][coordx - 1] == 'K')
+            depoisx = antesx - 1;
+            depoisy = antesy;
+            if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
                 return 0;
-            else return 1;
+            else moveu = 1;
             break;
         case 'b':
                         printf("bbbbbbbbbbbbbbbbbb");
-            if(table[coordy + 1][coordx] == 'X' || table[coordy + 1][coordx] == 'K')
+            depoisx = antesx;
+            depoisy = antesy + 1;
+            if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
                 return 0;
-            else return 1;
+            else moveu = 1;
             break;
         case 'd':
                         printf("ddddddddddddd");
-            if(table[coordy][coordx + 1] == 'X' || table[coordy][coordx + 1] == 'K')
+            depoisx = antesx + 1;
+            depoisy = antesy;
+            if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
                 return 0;
-            else return 1;
+            else moveu = 1;
             break;
         default:
                         printf("fffffffffffffff");
             printf("problema na recebicao do dir");
             break;
+    }
+
+    if (moveu == 1){
+        table[antesy][antesx] = '_';
+        table[depoisy][depoisx] = 'O';
+        return 1;
     }
 }
 
@@ -49,29 +71,31 @@ int main() {
     int varrepeat = 1; //para o laço de repetição do while
     int hithead = 0; //caso o player tente se mecher em um lugar que não consiga se mecher
 
+    for (int i = 0; i < 20; i++) {
+        for (int j = 0; j < 40; j++) {
+            if(i == 0 || i == 19 || j == 0 || j == 39)
+                table[i][j] = 'X'; //geração da tabela do jogo para ter paredes nas extremidades
+            else
+                table[i][j] = '_'; //lugar onde o player pode se mecher
+        }
+    }
+
+    for (int i = 0; i < 20; i++){
+        for (int j = 0; j < 40; j++){
+            if(table[i][j] == '_' && rand()%10 == 0) //aqui é gerado aleatoriamente vários blocos, que é K
+                table[i][j] = 'K';
+        }
+    }
+
     while(varrepeat == 1){
         system("cls"); //limpa a tela
 
         if (hithead == 1) //caso não consiga se mecher = printa BONK
-            printf("BONK\n");
+            printf("BONK");
+
+        printf("\n");
 
         hithead = 0;
-
-        for (int i = 0; i < 20; i++) {
-            for (int j = 0; j < 40; j++) {
-                if(i == 0 || i == 19 || j == 0 || j == 39)
-                    table[i][j] = 'X'; //geração da tabela do jogo para ter paredes nas extremidades
-                else
-                    table[i][j] = '_'; //lugar onde o player pode se mecher
-            }
-        }
-
-        for (int i = 0; i < 20; i++){
-            for (int j = 0; j < 40; j++){
-                if(table[i][j] == '_' && rand()%10 == 0) //aqui é gerado aleatoriamente vários blocos, que é K
-                    table[i][j] = 'K';
-            }
-        }
 
         table[coordy][coordx] = 'O'; //o player é renderizado em O
 
@@ -122,8 +146,6 @@ int main() {
         }
     }
 
-    printf("\n[[[[JOGO FECHADO]]]]\n(pressione algo para fechar)\n"); //caso o player digite 'q' e saia do jogo
-    getch(); //placeholder
-
+    printf("\n[[[[JOGO FECHADO]]]]\n(pressione algo para fechar)"); //caso o player digite 'q' e saia do jogo
     return 0; //fim
 }
