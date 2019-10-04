@@ -13,28 +13,35 @@ int checkmovable(Dir dir, char table[20][40], int antesx, int antesy){ //portas 
     switch(dir){
         case CIMA:
             depoisy--;
-            if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K'){ //|| quer dizer OU, se quiser dizer E, só colocar && (...) se o player tentar mecher o personagem para um bloco[K] ou parede[X], a função retorna negativo
-                return 0;
-            }
-            else moveu = 1;
+            if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K') //|| quer dizer OU, se quiser dizer E, só colocar && (...) se o player tentar mecher o personagem para um bloco[K] ou parede[X], a função retorna negativo
+                depoisy = antesy;
+            else
+                moveu = 1;
+            table[depoisy][depoisx] = '^';
             break;
         case ESQUERDA:
             depoisx--;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
-                return 0;
-            else moveu = 1;
+                depoisx = antesx;
+            else
+                moveu = 1;
+            table[depoisy][depoisx] = '<';
             break;
         case BAIXO:
             depoisy++;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
-                return 0;
-            else moveu = 1;
+                depoisy = antesy;
+            else
+                moveu = 1;
+            table[depoisy][depoisx] = 'V';
             break;
         case DIREITA:
             depoisx++;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
-                return 0;
-            else moveu = 1;
+                depoisx = antesx;
+            else
+                moveu = 1;
+            table[depoisy][depoisx] = '>';
             break;
         default:
             printf("problema na recebicao do dir");
@@ -42,23 +49,80 @@ int checkmovable(Dir dir, char table[20][40], int antesx, int antesy){ //portas 
     }
     if (moveu == 1){
         table[antesy][antesx] = '_';
-        table[depoisy][depoisx] = 'O';
         return 1;
     }
+    return 0;
 }
+
+void shoot(Dir dir, char table[20][40], int coordx, int coordy){
+    int shothit = 0;
+    switch(dir){
+        case CIMA: //^
+            for(; coordy > 0; coordy--){
+                if(table[coordy][coordx] == 'K'){
+                    table[coordy][coordx] = '*';
+                    return;
+                }
+                if(table[coordy][coordx] != '^')
+                    table[coordy][coordx] = '*';
+            }
+            break;
+        case BAIXO: //V
+            for(; coordy < 19; coordy++){
+                if(table[coordy][coordx] == 'K'){
+                    table[coordy][coordx] = '*';
+                    return;
+                }
+                if(table[coordy][coordx] != 'V')
+                    table[coordy][coordx] = '*';
+            }
+            break;
+        case DIREITA: //>
+            for(; coordx < 39; coordx++){
+                if(table[coordy][coordx] == 'K'){
+                    table[coordy][coordx] = '*';
+                    return;
+                }
+                if(table[coordy][coordx] != '>')
+                    table[coordy][coordx] = '*';
+            }
+            break;
+        case ESQUERDA: //<
+            for(; coordx > 0; coordx--){
+                if(table[coordy][coordx] == 'K'){
+                    table[coordy][coordx] = '*';
+                    return;
+                }
+                if(table[coordy][coordx] != '<')
+                    table[coordy][coordx] = '*';
+            }
+            break;
+        default:
+            printf("problema no tiro");
+            break;
+    }
+    return;
+}
+
+
+
+
+
 
 int main() {
     //int maxX;
     //int maxY;
-    //char table[maxY][maxX];
+    //malloc table[maxY][maxX];
     char table[20][40]; //inicialização da tabela do jogo, acima representação de dinâmico
     char mov; //valor do botão recebido do teclado
+    Dir dir;
 
     int coordx = 1; //coordenada do personagem em X
     int coordy = 1; //coordenada do personagem em Y
 
     int varrepeat = 1; //para o laço de repetição do while
     int hithead = 0; //caso o player tente se mecher em um lugar que não consiga se mecher
+    int shooteded = 0;
 
     for (int i = 0; i < 20; i++) {
         for (int j = 0; j < 40; j++) {
@@ -77,31 +141,40 @@ int main() {
         }
     }
 
+    table[coordy][coordx] = '>';
+
+
+
     while(varrepeat == 1){
         system("cls"); //limpa a tela
 
         if (hithead == 1) //caso não consiga se mecher = printa BONK
-            printf("BONK");
-        printf("\n");
+            printf("BONK\n");
+        else if (shooteded == 1)
+            printf("PEW\n");
+        else
+            printf("\n");
         hithead = 0;
-
-        table[coordy][coordx] = 'O'; //o player é renderizado em O
+        shooteded = 0;
+        //o player é renderizado em ^ > V <
 
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 40; j++) {
                 printf("%c", table[i][j]); //printa a tabela na tela
+                srand(time(NULL));
+                if(table[i][j] == '*' /*&& rand()%10 == 0*/)
+                    table[i][j] = '_';
             }
             printf("\n");
         }
-        printf("\n");
 
         printf("\ncoordx = %i\ncoordy = %i\n", coordx, coordy); //printa as coords do player na tela
-        printf("\n|_W_|\n"
-               "|ASD|\n"
-               "[Q TO QUIT]\n");
+        printf("\n|Q|W| ]\n"
+               "|A S D|\n"
+               "[SPACE to SHOOT]\n"
+               "[Q to QUIT]\n");
         mov = getch(); //pega o movimento do player do teclado q ele digitar, recebe a letra q tbm caso o player queira sair do jogo
 
-        Dir dir;
         switch(mov){
             case 'q':
                 varrepeat = 0; //acaba com o laço de repetição maior
@@ -129,6 +202,10 @@ int main() {
                 if(checkmovable(dir, table, coordx, coordy) == 0)
                     hithead = 1;
                 else coordx++;
+                break;
+            case ' ':
+                shoot(dir, table, coordx, coordy);
+                shooteded = 1;
                 break;
         }
     }
