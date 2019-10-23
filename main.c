@@ -6,7 +6,7 @@
 
 typedef enum {CIMA, BAIXO, DIREITA, ESQUERDA} Dir;
 
-int checkmovable(Dir dir, char table[20][40], int antesx, int antesy){ //portas lógicas para movimentação: para cima, para baixo, etc
+int checkmovable(Dir dir, char table[20][40], int antesx, int antesy, int* pontos){ //portas lógicas para movimentação: para cima, para baixo, etc
     int depoisx = antesx;
     int depoisy = antesy;
     int moveu = 0;
@@ -15,32 +15,40 @@ int checkmovable(Dir dir, char table[20][40], int antesx, int antesy){ //portas 
             depoisy--;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K') //|| quer dizer OU, se quiser dizer E, só colocar && (...) se o player tentar mecher o personagem para um bloco[K] ou parede[X], a função retorna negativo
                 depoisy = antesy;
-            else
+            else {
                 moveu = 1;
+                (*pontos)--;
+            }
             table[depoisy][depoisx] = '^';
             break;
         case ESQUERDA:
             depoisx--;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
                 depoisx = antesx;
-            else
+            else {
                 moveu = 1;
+                (*pontos)--;
+            }
             table[depoisy][depoisx] = '<';
             break;
         case BAIXO:
             depoisy++;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
                 depoisy = antesy;
-            else
+            else {
                 moveu = 1;
+                (*pontos)--;
+            }
             table[depoisy][depoisx] = 'V';
             break;
         case DIREITA:
             depoisx++;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
                 depoisx = antesx;
-            else
+            else {
                 moveu = 1;
+                (*pontos)--;
+            }
             table[depoisy][depoisx] = '>';
             break;
         default:
@@ -54,13 +62,14 @@ int checkmovable(Dir dir, char table[20][40], int antesx, int antesy){ //portas 
     return 0;
 }
 
-void shoot(Dir dir, char table[20][40], int coordx, int coordy){
+void shoot(Dir dir, char table[20][40], int coordx, int coordy, int* pontos){
     int shothit = 0;
     switch(dir){
         case CIMA: //^
             for(; coordy > 0; coordy--){
                 if(table[coordy][coordx] == 'K'){
                     table[coordy][coordx] = '*';
+                    (*pontos)=(*pontos) + 3;
                     return;
                 }
                 if(table[coordy][coordx] != '^')
@@ -71,6 +80,7 @@ void shoot(Dir dir, char table[20][40], int coordx, int coordy){
             for(; coordy < 19; coordy++){
                 if(table[coordy][coordx] == 'K'){
                     table[coordy][coordx] = '*';
+                    (*pontos)=(*pontos) + 3;
                     return;
                 }
                 if(table[coordy][coordx] != 'V')
@@ -81,6 +91,7 @@ void shoot(Dir dir, char table[20][40], int coordx, int coordy){
             for(; coordx < 39; coordx++){
                 if(table[coordy][coordx] == 'K'){
                     table[coordy][coordx] = '*';
+                    (*pontos)=(*pontos) + 3;
                     return;
                 }
                 if(table[coordy][coordx] != '>')
@@ -91,6 +102,7 @@ void shoot(Dir dir, char table[20][40], int coordx, int coordy){
             for(; coordx > 0; coordx--){
                 if(table[coordy][coordx] == 'K'){
                     table[coordy][coordx] = '*';
+                    (*pontos)=(*pontos) + 3;
                     return;
                 }
                 if(table[coordy][coordx] != '<')
@@ -116,6 +128,8 @@ int main() {
     char table[20][40]; //inicialização da tabela do jogo, acima representação de dinâmico
     char mov; //valor do botão recebido do teclado
     Dir dir;
+
+    int pontos = 0;
 
     int coordx = 1; //coordenada do personagem em X
     int coordy = 1; //coordenada do personagem em Y
@@ -143,8 +157,6 @@ int main() {
 
     table[coordy][coordx] = '>';
 
-
-
     while(varrepeat == 1){
         system("cls"); //limpa a tela
 
@@ -158,17 +170,21 @@ int main() {
         shooteded = 0;
         //o player é renderizado em ^ > V <
 
+        if (pontos < 0)
+            pontos = 0;
+        printf("/PONTOS: %i/\n", pontos);
+
         for (int i = 0; i < 20; i++) {
             for (int j = 0; j < 40; j++) {
                 printf("%c", table[i][j]); //printa a tabela na tela
                 srand(time(NULL));
-                if(table[i][j] == '*' /*&& rand()%10 == 0*/)
+                if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
                     table[i][j] = '_';
             }
             printf("\n");
         }
 
-        printf("\ncoordx = %i\ncoordy = %i\n", coordx, coordy); //printa as coords do player na tela
+        printf("\ncoordenadas = %i, %i\n", coordx, coordy); //printa as coords do player na tela
         printf("\n|Q|W| ]\n"
                "|A S D|\n"
                "[SPACE to SHOOT]\n"
@@ -181,30 +197,30 @@ int main() {
                 break;
             case 'w':
                 dir = CIMA;
-                if(checkmovable(dir, table, coordx, coordy) == 0) //se não conseguir se mecher para [dir], variavel de não cosneguir se mecher é positiva
+                if(checkmovable(dir, table, coordx, coordy, &pontos) == 0) //se não conseguir se mecher para [dir], variavel de não cosneguir se mecher é positiva
                     hithead = 1;
                 else coordy--; //caso consiga se mecher, a variavel da respectiva coordenada é alterada / o personagem se meche
                 break;
             case 's':
                 dir = BAIXO;
-                if(checkmovable(dir, table, coordx, coordy) == 0)
+                if(checkmovable(dir, table, coordx, coordy, &pontos) == 0)
                     hithead = 1;
                 else coordy++;
                 break;
             case 'a':
                 dir = ESQUERDA;
-                if(checkmovable(dir, table, coordx, coordy) == 0)
+                if(checkmovable(dir, table, coordx, coordy, &pontos) == 0)
                     hithead = 1;
                 else coordx--;
                 break;
             case 'd':
                 dir = DIREITA;
-                if(checkmovable(dir, table, coordx, coordy) == 0)
+                if(checkmovable(dir, table, coordx, coordy, &pontos) == 0)
                     hithead = 1;
                 else coordx++;
                 break;
             case ' ':
-                shoot(dir, table, coordx, coordy);
+                shoot(dir, table, coordx, coordy, &pontos);
                 shooteded = 1;
                 break;
         }
