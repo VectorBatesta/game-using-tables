@@ -15,40 +15,32 @@ int checkmovable(Dir dir, char table[20][40], int antesx, int antesy, int* ponto
             depoisy--;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K') //|| quer dizer OU, se quiser dizer E, só colocar && (...) se o player tentar mecher o personagem para um bloco[K] ou parede[X], a função retorna negativo
                 depoisy = antesy;
-            else {
+            else
                 moveu = 1;
-                (*pontos)--;
-            }
             table[depoisy][depoisx] = '^';
             break;
         case ESQUERDA:
             depoisx--;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
                 depoisx = antesx;
-            else {
+            else
                 moveu = 1;
-                (*pontos)--;
-            }
             table[depoisy][depoisx] = '<';
             break;
         case BAIXO:
             depoisy++;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
                 depoisy = antesy;
-            else {
+            else
                 moveu = 1;
-                (*pontos)--;
-            }
             table[depoisy][depoisx] = 'V';
             break;
         case DIREITA:
             depoisx++;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
                 depoisx = antesx;
-            else {
+            else
                 moveu = 1;
-                (*pontos)--;
-            }
             table[depoisy][depoisx] = '>';
             break;
         default:
@@ -57,6 +49,7 @@ int checkmovable(Dir dir, char table[20][40], int antesx, int antesy, int* ponto
     }
     if (moveu == 1){
         table[antesy][antesx] = '_';
+        (*pontos)--;
         return 1;
     }
     return 0;
@@ -113,9 +106,8 @@ void shoot(Dir dir, char table[20][40], int coordx, int coordy, int* pontos){
             printf("problema no tiro");
             break;
     }
-    return;
+    return;        //o player é renderizado em ^ > V <
 }
-
 
 
 
@@ -136,7 +128,7 @@ int main() {
 
     int varrepeat = 1; //para o laço de repetição do while
     int hithead = 0; //caso o player tente se mecher em um lugar que não consiga se mecher
-    int shooteded = 0;
+    int shooteded = 0; //para saber se atirou ou não
 
     for (int i = 0; i < 20; i++) {
         for (int j = 0; j < 40; j++) {
@@ -155,20 +147,19 @@ int main() {
         }
     }
 
-    table[coordy][coordx] = '>';
+    table[coordy][coordx] = '>'; //renderiza o player [quando o jogo é iniciado] olhando para direita
 
     while(varrepeat == 1){
         system("cls"); //limpa a tela
 
         if (hithead == 1) //caso não consiga se mecher = printa BONK
             printf("BONK\n");
-        else if (shooteded == 1)
+        else if (shooteded == 1) //caso atire = printa PEW
             printf("PEW\n");
-        else
+        else //caso nada = apenas uma linha em branco para não ficar desproporcional a imagem
             printf("\n");
-        hithead = 0;
+        hithead = 0; //após verificado tudo, reseta os parâmetros
         shooteded = 0;
-        //o player é renderizado em ^ > V <
 
         if (pontos < 0)
             pontos = 0;
@@ -188,7 +179,7 @@ int main() {
         printf("\n|Q|W| ]\n"
                "|A S D|\n"
                "[SPACE to SHOOT]\n"
-               "[Q to QUIT]\n");
+               "[Q to QUIT]\n"); //printa os controles
         mov = getch(); //pega o movimento do player do teclado q ele digitar, recebe a letra q tbm caso o player queira sair do jogo
 
         switch(mov){
@@ -199,7 +190,7 @@ int main() {
                 dir = CIMA;
                 if(checkmovable(dir, table, coordx, coordy, &pontos) == 0) //se não conseguir se mecher para [dir], variavel de não cosneguir se mecher é positiva
                     hithead = 1;
-                else coordy--; //caso consiga se mecher, a variavel da respectiva coordenada é alterada / o personagem se meche
+                else coordy--; //caso consiga se mecher, a variável da respectiva coordenada é alterada [o personagem se meche]
                 break;
             case 's':
                 dir = BAIXO;
@@ -220,8 +211,8 @@ int main() {
                 else coordx++;
                 break;
             case ' ':
-                shoot(dir, table, coordx, coordy, &pontos);
-                shooteded = 1;
+                shoot(dir, table, coordx, coordy, &pontos); //abre função para atirar na frente do player
+                shooteded = 1; //após atirar, a variável de atirar é alterada [o personagem atira]
                 break;
         }
     }
