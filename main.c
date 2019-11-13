@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <conio.h>
 #include <time.h>
+#include <stdlib.h>
 
 #define U_16 0x20000  //U-16 text mode, for the text blocks -> ignorar isso, serve apenas caso tenha caractere especial
 
 typedef enum {CIMA, BAIXO, DIREITA, ESQUERDA} Dir;
 
-int checkmovable(Dir dir, char table[20][40], int antesx, int antesy, int* pontos){ //portas lógicas para movimentação: para cima, para baixo, etc
+int checkmovable(Dir dir, char table[20][40], int antesx, int antesy, int* pontos, int* vida){ //portas lógicas para movimentação: para cima, para baixo, etc
     int depoisx = antesx;
     int depoisy = antesy;
     int moveu = 0;
@@ -15,6 +16,11 @@ int checkmovable(Dir dir, char table[20][40], int antesx, int antesy, int* ponto
             depoisy--;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K') //|| quer dizer OU, se quiser dizer E, só colocar && (...) se o player tentar mecher o personagem para um bloco[K] ou parede[X], a função retorna negativo
                 depoisy = antesy;
+            else if(table[depoisy][depoisx] == 'E'){
+                depoisy = antesy;
+                (*vida)--;
+                moveu = 2;
+            }
             else
                 moveu = 1;
             table[depoisy][depoisx] = '^';
@@ -23,6 +29,11 @@ int checkmovable(Dir dir, char table[20][40], int antesx, int antesy, int* ponto
             depoisx--;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
                 depoisx = antesx;
+            else if(table[depoisy][depoisx] == 'E'){
+                depoisx = antesx;
+                (*vida)--;
+                moveu = 2;
+            }
             else
                 moveu = 1;
             table[depoisy][depoisx] = '<';
@@ -31,6 +42,11 @@ int checkmovable(Dir dir, char table[20][40], int antesx, int antesy, int* ponto
             depoisy++;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
                 depoisy = antesy;
+            else if(table[depoisy][depoisx] == 'E'){
+                depoisy = antesy;
+                (*vida)--;
+                moveu = 2;
+            }
             else
                 moveu = 1;
             table[depoisy][depoisx] = 'V';
@@ -39,6 +55,11 @@ int checkmovable(Dir dir, char table[20][40], int antesx, int antesy, int* ponto
             depoisx++;
             if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
                 depoisx = antesx;
+            else if(table[depoisy][depoisx] == 'E'){
+                depoisx = antesx;
+                (*vida)--;
+                moveu = 2;
+            }
             else
                 moveu = 1;
             table[depoisy][depoisx] = '>';
@@ -109,6 +130,38 @@ void shoot(Dir dir, char table[20][40], int coordx, int coordy, int* pontos){
     return;        //o player é renderizado em ^ > V <
 }
 
+void printavida(int* vida, int maxvida){
+    if(vida > maxvida)
+        vida = maxvida;
+
+    printf("\nVIDA [");
+    for(int quantvida = vida; maxvida > 0; maxvida--){
+        if (quantvida > 0)
+            printf("O");
+        else
+            printf("_");
+    }
+    printf("]\n");
+}
+
+void gameover(){
+    printf("\n  sSSSSs   .S_SSSs     .S_SsS_S.     sSSs          sSSs_sSSs     .S    S.     sSSs   .S_sSSs"
+" d%%%%SP  .SS~SSSSS   .SS~S*S~SS.   d%%SP         d%%SP~YS%%b   .SS    SS.   d%%SP  .SS~YS%%b"
+"d%S\'      S%S   SSSS  S%S `Y\' S%S  d%S\'          d%S\'     `S%b  S%S    S%S  d%S\'    S%S   `S%b"
+"S%S       S%S    S%S  S%S     S%S  S%S           S%S       S%S  S%S    S%S  S%S     S%S    S%S"
+"S&S       S%S SSSS%S  S%S     S%S  S&S           S&S       S&S  S&S    S%S  S&S     S%S    d*S"
+"S&S       S&S  SSS%S  S&S     S&S  S&S_Ss        S&S       S&S  S&S    S&S  S&S_Ss  S&S   .S*S"
+"S&S       S&S    S&S  S&S     S&S  S&S~SP        S&S       S&S  S&S    S&S  S&S~SP  S&S_sdSSS"
+"S&S sSSs  S&S    S&S  S&S     S&S  S&S           S&S       S&S  S&S    S&S  S&S     S&S~YSY%b"
+"S*b `S%%  S*S    S&S  S*S     S*S  S*b           S*b       d*S  S*b    S*S  S*b     S*S   `S%b"
+"S*S   S%  S*S    S*S  S*S     S*S  S*S.          S*S.     .S*S  S*S.   S*S  S*S.    S*S    S%S"
+" SS_sSSS  S*S    S*S  S*S     S*S   SSSbs         SSSbs_sdSSS    SSSbs_S*S   SSSbs  S*S    S&S"
+"  Y~YSSY  SSS    S*S  SSS     S*S    YSSP          YSSP~YSSY      YSSP~SSS    YSSP  S*S    SSS"
+"                 SP           SP                                                    SP"
+"                 Y            Y                                                     Y");
+}
+
+
 
 
 
@@ -119,6 +172,11 @@ int main() {
     //malloc table[maxY][maxX];
     char table[20][40]; //inicialização da tabela do jogo, acima representação de dinâmico
     char mov; //valor do botão recebido do teclado
+
+    int maxvida;
+    int vida;
+    int escolhavida;
+
     Dir dir;
 
     int pontos = 0;
@@ -144,10 +202,34 @@ int main() {
         for (int j = 0; j < 40; j++){
             if(table[i][j] == '_' && rand()%10 == 0) //aqui é gerado aleatoriamente vários blocos, que é K
                 table[i][j] = 'K';
+            if(table[i][j] == '_' && rand()%100 == 0)
+                table[i][j] = 'E';
         }
     }
 
     table[coordy][coordx] = '>'; //renderiza o player [quando o jogo é iniciado] olhando para direita
+
+    printf("\nSelecione a dificuldade.\n1> Facil [5 vidas]\n2> Medio [4 vidas]\n3> Dificil [3 vidas]\n4> Impossivel [1hitkill]\n\nESCOLHA: ");
+    scanf("%i", &escolhavida);
+    switch(escolhavida){
+        case 1:
+            maxvida = 5;
+            break;
+        case 2:
+            maxvida = 4;
+            break;
+        case 3:
+            maxvida = 3;
+            break;
+        case 4:
+            maxvida = 1;
+            break;
+        default:
+            printf("\nproblema na escolha da dificuldade");
+            return;
+    }
+
+    vida = maxvida;
 
     while(varrepeat == 1){
         system("cls"); //limpa a tela
@@ -175,7 +257,10 @@ int main() {
             printf("\n");
         }
 
-        printf("\ncoordenadas = %i, %i\n", coordx, coordy); //printa as coords do player na tela
+        printf("coordenadas = %i, %i", coordx, coordy); //printa as coords do player na tela
+
+        printavida(vida, maxvida);
+
         printf("\n|Q|W| ]\n"
                "|A S D|\n"
                "[SPACE to SHOOT]\n"
@@ -188,25 +273,25 @@ int main() {
                 break;
             case 'w':
                 dir = CIMA;
-                if(checkmovable(dir, table, coordx, coordy, &pontos) == 0) //se não conseguir se mecher para [dir], variavel de não cosneguir se mecher é positiva
+                if(checkmovable(dir, table, coordx, coordy, &pontos, &vida) == 0) //se não conseguir se mecher para [dir], variavel de não cosneguir se mecher é positiva
                     hithead = 1;
                 else coordy--; //caso consiga se mecher, a variável da respectiva coordenada é alterada [o personagem se meche]
                 break;
             case 's':
                 dir = BAIXO;
-                if(checkmovable(dir, table, coordx, coordy, &pontos) == 0)
+                if(checkmovable(dir, table, coordx, coordy, &pontos, &vida) == 0)
                     hithead = 1;
                 else coordy++;
                 break;
             case 'a':
                 dir = ESQUERDA;
-                if(checkmovable(dir, table, coordx, coordy, &pontos) == 0)
+                if(checkmovable(dir, table, coordx, coordy, &pontos, &vida) == 0)
                     hithead = 1;
                 else coordx--;
                 break;
             case 'd':
                 dir = DIREITA;
-                if(checkmovable(dir, table, coordx, coordy, &pontos) == 0)
+                if(checkmovable(dir, table, coordx, coordy, &pontos, &vida) == 0)
                     hithead = 1;
                 else coordx++;
                 break;
@@ -214,6 +299,11 @@ int main() {
                 shoot(dir, table, coordx, coordy, &pontos); //abre função para atirar na frente do player
                 shooteded = 1; //após atirar, a variável de atirar é alterada [o personagem atira]
                 break;
+        }
+
+        if(vida == 0){
+            gameover();
+            return 0;
         }
     }
 
