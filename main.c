@@ -77,13 +77,18 @@ int checkmovable(Dir dir, char table[20][40], int antesx, int antesy, int* ponto
 }
 
 void shoot(Dir dir, char table[20][40], int coordx, int coordy, int* pontos){
-    int shothit = 0;
+    printf("%i", dir);
     switch(dir){
         case CIMA: //^
             for(; coordy > 0; coordy--){
                 if(table[coordy][coordx] == 'K'){
                     table[coordy][coordx] = '*';
                     (*pontos)=(*pontos) + 3;
+                    return;
+                }
+                if(table[coordy][coordx] == 'E'){
+                    table[coordy][coordx] = '*';
+                    (*pontos)=(*pontos) + 8;
                     return;
                 }
                 if(table[coordy][coordx] != '^')
@@ -97,6 +102,11 @@ void shoot(Dir dir, char table[20][40], int coordx, int coordy, int* pontos){
                     (*pontos)=(*pontos) + 3;
                     return;
                 }
+                if(table[coordy][coordx] == 'E'){
+                    table[coordy][coordx] = '*';
+                    (*pontos)=(*pontos) + 8;
+                    return;
+                }
                 if(table[coordy][coordx] != 'V')
                     table[coordy][coordx] = '*';
             }
@@ -108,6 +118,11 @@ void shoot(Dir dir, char table[20][40], int coordx, int coordy, int* pontos){
                     (*pontos)=(*pontos) + 3;
                     return;
                 }
+                if(table[coordy][coordx] == 'E'){
+                    table[coordy][coordx] = '*';
+                    (*pontos)=(*pontos) + 8;
+                    return;
+                }
                 if(table[coordy][coordx] != '>')
                     table[coordy][coordx] = '*';
             }
@@ -117,6 +132,11 @@ void shoot(Dir dir, char table[20][40], int coordx, int coordy, int* pontos){
                 if(table[coordy][coordx] == 'K'){
                     table[coordy][coordx] = '*';
                     (*pontos)=(*pontos) + 3;
+                    return;
+                }
+                if(table[coordy][coordx] == 'E'){
+                    table[coordy][coordx] = '*';
+                    (*pontos)=(*pontos) + 8;
                     return;
                 }
                 if(table[coordy][coordx] != '<')
@@ -136,8 +156,10 @@ void printavida(int* vida, int maxvida){
 
     printf("\nVIDA [");
     for(int quantvida = vida; maxvida > 0; maxvida--){
-        if (quantvida > 0)
+        if (quantvida > 0){
             printf("O");
+            quantvida--;
+        }
         else
             printf("_");
     }
@@ -163,36 +185,122 @@ void gameover(){
 }
 
 void menuprincipal(){
-    
-    
-    
-    
-    
+
+
+
+
+
 }
+
+void printacontroles(char* mov){
+    printf("\n|Q|W| ]\n"
+             "|A S D|\n"
+             "[SPACE to SHOOT]\n"
+             "[Q to QUIT]\n"); //printa os controles
+    *mov = getch(); //pega o movimento do player do teclado q ele digitar, recebe a letra q tbm caso o player queira sair do jogo
+}
+
+void printajogo(char table[20][40]){
+    for (int i = 0; i < 20; i++) {
+        printf("\n");
+        for (int j = 0; j < 40; j++) {
+            printf("%c", table[i][j]); //printa a tabela na tela
+            srand(time(NULL));
+            if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
+                table[i][j] = '_';
+        }
+    }
+}
+
+void printapontosecoords(int* pontos, int coordx, int coordy){
+    if (*pontos < 0)
+        *pontos = 0;
+    printf("/PONTOS: %i/\n", *pontos);
+    printf("coordenadas = %i, %i", coordx, coordy); //printa as coords do player na tela
+}
+
+void selecionadificuldade(int* maxvida, int* vida){
+    int escolhavida;
+    printf("\nSelecione a dificuldade.\n1> Facil [5 vidas]\n2> Medio [4 vidas]\n3> Dificil [3 vidas]\n4> Impossivel [1hitkill]\n\nESCOLHA: ");
+    scanf("%i", &escolhavida);
+    switch(escolhavida){
+        case 1:
+            *maxvida = 5;
+            break;
+        case 2:
+            *maxvida = 4;
+            break;
+        case 3:
+            *maxvida = 3;
+            break;
+        case 4:
+            *maxvida = 1;
+            break;
+        default:
+            printf("\nproblema na escolha da dificuldade");
+            return;
+    }
+    *vida = *maxvida;
+}
+
+void reconheceplayer(char* mov, int* varrepeat, Dir dir, char table[20][40], int* coordx, int* coordy, int* pontos, int* vida, int* hithead, int* shooteded){
+    switch(*mov){
+        case 'q':
+            *varrepeat = 0; //acaba com o laço de repetição maior
+            break;
+        case 'w':
+            dir = CIMA;
+            if(checkmovable(dir, table, *coordx, *coordy, &(*pontos), &(*vida)) == 0) //se não conseguir se mecher para [dir], variavel de não cosneguir se mecher é positiva
+                *hithead = 1;
+            else (*coordy)--; //caso consiga se mecher, a variável da respectiva coordenada é alterada [o personagem se meche]
+            break;
+        case 's':
+            dir = BAIXO;
+            if(checkmovable(dir, table, *coordx, *coordy, &(*pontos), &(*vida)) == 0)
+                *hithead = 1;
+            else (*coordy)++;
+            break;
+        case 'a':
+            dir = ESQUERDA;
+            if(checkmovable(dir, table, *coordx, *coordy, &(*pontos), &(*vida)) == 0)
+                *hithead = 1;
+            else (*coordx)--;
+            break;
+        case 'd':
+            dir = DIREITA;
+            if(checkmovable(dir, table, *coordx, *coordy, &(*pontos), &(*vida)) == 0)
+                *hithead = 1;
+            else (*coordx)++;
+            break;
+        case ' ':
+                printf("%i", dir);
+            shoot(dir, table, *coordx, *coordy, &(*pontos)); //abre função para atirar na frente do player
+            *shooteded = 1; //após atirar, a variável de atirar é alterada [o personagem atira]
+            break;
+    }
+}
+
+
+
+
 
 
 
 
 int main() {
     menuprincipal();
-    
+
     //int maxX;
     //int maxY;
     //malloc table[maxY][maxX];
     char table[20][40]; //inicialização da tabela do jogo, acima representação de dinâmico
     char mov; //valor do botão recebido do teclado
-
-    int maxvida;
-    int vida;
-    int escolhavida;
-
-    Dir dir;
-
+    int maxvida; //quantidade de vida MÁXIMA
+    int vida; //quantidade de vida ATUAL
+    Dir dir; //inicialização do enum
     int pontos = 0;
-
     int coordx = 1; //coordenada do personagem em X
     int coordy = 1; //coordenada do personagem em Y
-
     int varrepeat = 1; //para o laço de repetição do while
     int hithead = 0; //caso o player tente se mecher em um lugar que não consiga se mecher
     int shooteded = 0; //para saber se atirou ou não
@@ -205,7 +313,6 @@ int main() {
                 table[i][j] = '_'; //lugar onde o player pode se mecher
         }
     }
-
     srand(time(NULL));
     for (int i = 0; i < 20; i++){
         for (int j = 0; j < 40; j++){
@@ -218,27 +325,7 @@ int main() {
 
     table[coordy][coordx] = '>'; //renderiza o player [quando o jogo é iniciado] olhando para direita
 
-    printf("\nSelecione a dificuldade.\n1> Facil [5 vidas]\n2> Medio [4 vidas]\n3> Dificil [3 vidas]\n4> Impossivel [1hitkill]\n\nESCOLHA: ");
-    scanf("%i", &escolhavida);
-    switch(escolhavida){
-        case 1:
-            maxvida = 5;
-            break;
-        case 2:
-            maxvida = 4;
-            break;
-        case 3:
-            maxvida = 3;
-            break;
-        case 4:
-            maxvida = 1;
-            break;
-        default:
-            printf("\nproblema na escolha da dificuldade");
-            return;
-    }
-
-    vida = maxvida;
+    selecionadificuldade(&maxvida, &vida);
 
     while(varrepeat == 1){
         system("cls"); //limpa a tela
@@ -252,63 +339,12 @@ int main() {
         hithead = 0; //após verificado tudo, reseta os parâmetros
         shooteded = 0;
 
-        if (pontos < 0)
-            pontos = 0;
-        printf("/PONTOS: %i/\n", pontos);
-
-        for (int i = 0; i < 20; i++) {
-            for (int j = 0; j < 40; j++) {
-                printf("%c", table[i][j]); //printa a tabela na tela
-                srand(time(NULL));
-                if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
-                    table[i][j] = '_';
-            }
-            printf("\n");
-        }
-
-        printf("coordenadas = %i, %i", coordx, coordy); //printa as coords do player na tela
-
+        printapontosecoords(&pontos, coordx, coordy);
+        printajogo(table);
         printavida(vida, maxvida);
+        printacontroles(&mov);
 
-        printf("\n|Q|W| ]\n"
-               "|A S D|\n"
-               "[SPACE to SHOOT]\n"
-               "[Q to QUIT]\n"); //printa os controles
-        mov = getch(); //pega o movimento do player do teclado q ele digitar, recebe a letra q tbm caso o player queira sair do jogo
-
-        switch(mov){
-            case 'q':
-                varrepeat = 0; //acaba com o laço de repetição maior
-                break;
-            case 'w':
-                dir = CIMA;
-                if(checkmovable(dir, table, coordx, coordy, &pontos, &vida) == 0) //se não conseguir se mecher para [dir], variavel de não cosneguir se mecher é positiva
-                    hithead = 1;
-                else coordy--; //caso consiga se mecher, a variável da respectiva coordenada é alterada [o personagem se meche]
-                break;
-            case 's':
-                dir = BAIXO;
-                if(checkmovable(dir, table, coordx, coordy, &pontos, &vida) == 0)
-                    hithead = 1;
-                else coordy++;
-                break;
-            case 'a':
-                dir = ESQUERDA;
-                if(checkmovable(dir, table, coordx, coordy, &pontos, &vida) == 0)
-                    hithead = 1;
-                else coordx--;
-                break;
-            case 'd':
-                dir = DIREITA;
-                if(checkmovable(dir, table, coordx, coordy, &pontos, &vida) == 0)
-                    hithead = 1;
-                else coordx++;
-                break;
-            case ' ':
-                shoot(dir, table, coordx, coordy, &pontos); //abre função para atirar na frente do player
-                shooteded = 1; //após atirar, a variável de atirar é alterada [o personagem atira]
-                break;
-        }
+        reconheceplayer(&mov, &varrepeat, dir, table, &coordx, &coordy, &pontos, &vida, &hithead, &shooteded);
 
         if(vida == 0){
             gameover();
