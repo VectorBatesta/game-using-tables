@@ -145,28 +145,37 @@ void printavida(int* vida, int maxvida){
 }
 
 void gameover(){
-    printf("\n  sSSSSs   .S_SSSs     .S_SsS_S.     sSSs          sSSs_sSSs     .S    S.     sSSs   .S_sSSs"
-" d%%%%SP  .SS~SSSSS   .SS~S*S~SS.   d%%SP         d%%SP~YS%%b   .SS    SS.   d%%SP  .SS~YS%%b"
-"d%S\'      S%S   SSSS  S%S `Y\' S%S  d%S\'          d%S\'     `S%b  S%S    S%S  d%S\'    S%S   `S%b"
-"S%S       S%S    S%S  S%S     S%S  S%S           S%S       S%S  S%S    S%S  S%S     S%S    S%S"
-"S&S       S%S SSSS%S  S%S     S%S  S&S           S&S       S&S  S&S    S%S  S&S     S%S    d*S"
-"S&S       S&S  SSS%S  S&S     S&S  S&S_Ss        S&S       S&S  S&S    S&S  S&S_Ss  S&S   .S*S"
-"S&S       S&S    S&S  S&S     S&S  S&S~SP        S&S       S&S  S&S    S&S  S&S~SP  S&S_sdSSS"
-"S&S sSSs  S&S    S&S  S&S     S&S  S&S           S&S       S&S  S&S    S&S  S&S     S&S~YSY%b"
-"S*b `S%%  S*S    S&S  S*S     S*S  S*b           S*b       d*S  S*b    S*S  S*b     S*S   `S%b"
-"S*S   S%  S*S    S*S  S*S     S*S  S*S.          S*S.     .S*S  S*S.   S*S  S*S.    S*S    S%S"
-" SS_sSSS  S*S    S*S  S*S     S*S   SSSbs         SSSbs_sdSSS    SSSbs_S*S   SSSbs  S*S    S&S"
-"  Y~YSSY  SSS    S*S  SSS     S*S    YSSP          YSSP~YSSY      YSSP~SSS    YSSP  S*S    SSS"
-"                 SP           SP                                                    SP"
-"                 Y            Y                                                     Y");
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+"\n  sSSSSs   .S_SSSs     .S_SsS_S.     sSSs          sSSs_sSSs     .S    S.     sSSs   .S_sSSs"
+"\n d%%%%%%%%SP  .SS~SSSSS   .SS~S*S~SS.   d%%%%SP         d%%%%SP~YS%%%%b   .SS    SS.   d%%%%SP  .SS~YS%%%%b"
+"\nd%%S'      S%%S   SSSS  S%%S `Y' S%%S  d%%S'          d%%S'     `S%%b  S%%S    S%%S  d%%S'    S%%S   `S%%b"
+"\nS%%S       S%%S    S%%S  S%%S     S%%S  S%%S           S%%S       S%%S  S%%S    S%%S  S%%S     S%%S    S%%S"
+"\nS&S       S%%S SSSS%%S  S%%S     S%%S  S&S           S&S       S&S  S&S    S%%S  S&S     S%%S    d*S"
+"\nS&S       S&S  SSS%%S  S&S     S&S  S&S_Ss        S&S       S&S  S&S    S&S  S&S_Ss  S&S   .S*S"
+"\nS&S       S&S    S&S  S&S     S&S  S&S~SP        S&S       S&S  S&S    S&S  S&S~SP  S&S_sdSSS"
+"\nS&S sSSs  S&S    S&S  S&S     S&S  S&S           S&S       S&S  S&S    S&S  S&S     S&S~YSY%%b"
+"\nS*b `S%%%%  S*S    S&S  S*S     S*S  S*b           S*b       d*S  S*b    S*S  S*b     S*S   `S%%b"
+"\nS*S   S%%  S*S    S*S  S*S     S*S  S*S.          S*S.     .S*S  S*S.   S*S  S*S.    S*S    S%%S"
+"\n SS_sSSS  S*S    S*S  S*S     S*S   SSSbs         SSSbs_sdSSS    SSSbs_S*S   SSSbs  S*S    S&S"
+"\n  Y~YSSY  SSS    S*S  SSS     S*S    YSSP          YSSP~YSSY      YSSP~SSS    YSSP  S*S    SSS"
+"\n                 SP           SP                                                    SP"
+"\n                 Y            Y                                                     Y");
+}
+
+void menuprincipal(){
+    
+    
+    
+    
+    
 }
 
 
 
 
-
-
 int main() {
+    menuprincipal();
+    
     //int maxX;
     //int maxY;
     //malloc table[maxY][maxX];
@@ -303,6 +312,8 @@ int main() {
 
         if(vida == 0){
             gameover();
+            printf("\n\nYOU ARE DEAD!! [pressione algo para fechar o jogo]\n");
+            getch();
             return 0;
         }
     }
