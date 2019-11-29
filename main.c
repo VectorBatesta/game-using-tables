@@ -290,9 +290,6 @@ void reconheceplayer(char* mov, int* varrepeat, Dir dir, char table[20][40], int
 int main() {
     menuprincipal();
 
-    //int maxX;
-    //int maxY;
-    //malloc table[maxY][maxX];
     char table[20][40]; //inicialização da tabela do jogo, acima representação de dinâmico
     char mov; //valor do botão recebido do teclado
     int maxvida; //quantidade de vida MÁXIMA
@@ -305,6 +302,42 @@ int main() {
     int hithead = 0; //caso o player tente se mecher em um lugar que não consiga se mecher
     int shooteded = 0; //para saber se atirou ou não
 
+    int mapacoordx = 0; //inicialização do mapa em x=0
+    int mapacoordy = 0; //inicialização do mapa em y=0
+    char nomemapa[12]; //string para ser concatenada e ser lida para o arquivo
+    char mapacoordxchar[2]; //mesmo q mapacoordx porem agora em char
+    char mapacoordychar[2]; //mesmo q mapacoordy porem agora em char
+    int tamtablex = 0; //inicialização da altura da tabela do jogo
+    int tamtabley = 0; //inicialização do comprimento da tabela do jogo
+
+    itoa(mapacoordx, mapacoordxchar,10);
+    itoa(mapacoordy, mapacoordychar,10);
+    strcpy(nomemapa,"mapa");
+    strcat(nomemapa,mapacoordxchar);
+    strcat(nomemapa,mapacoordychar);
+    strcat(nomemapa,".txt");
+    printf("%s\n", nomemapa);
+
+    FILE * mapa;
+    mapa = fopen(nomemapa, "r");
+    if (mapa == NULL){
+        printf("erro na leitura do arquivo\n");
+        getch();
+        return 2;
+    }
+
+    tamtablex = tamtabley = 0;
+    char firstlinha[100];
+    fgets(firstlinha, 100, mapa);
+    tamtablex = strlen(firstlinha) - 1;
+
+    while(fgets(firstlinha, 100, mapa) != NULL){
+        tamtabley++;
+    }
+    rewind(mapa);
+    tamtabley++;
+
+/*
     for (int i = 0; i < 20; i++) {
         for (int j = 0; j < 40; j++) {
             if(i == 0 || i == 19 || j == 0 || j == 39)
@@ -322,6 +355,7 @@ int main() {
                 table[i][j] = 'E';
         }
     }
+*/
 
     table[coordy][coordx] = '>'; //renderiza o player [quando o jogo é iniciado] olhando para direita
 
