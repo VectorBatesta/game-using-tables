@@ -2,6 +2,8 @@
 #include <conio.h>
 #include <time.h>
 #include <stdlib.h>
+#include <string.h>
+#include <windows.h>
 
 #define U_16 0x20000  //U-16 text mode, for the text blocks -> ignorar isso, serve apenas caso tenha caractere especial
 
@@ -184,14 +186,6 @@ void gameover(){
 "\n                 Y            Y                                                     Y");
 }
 
-void menuprincipal(){
-
-
-
-
-
-}
-
 void printacontroles(char* mov){
     printf("\n|Q|W| ]\n"
              "|A S D|\n"
@@ -200,10 +194,10 @@ void printacontroles(char* mov){
     *mov = getch(); //pega o movimento do player do teclado q ele digitar, recebe a letra q tbm caso o player queira sair do jogo
 }
 
-void printajogo(char table[20][40]){
-    for (int i = 0; i < 20; i++) {
+void printajogo(char **table, int tamtablex, int tamtabley){
+    for (int i = 0; i < tamtabley; i++) {
         printf("\n");
-        for (int j = 0; j < 40; j++) {
+        for (int j = 0; j < tamtablex; j++) {
             printf("%c", table[i][j]); //printa a tabela na tela
             srand(time(NULL));
             if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
@@ -280,22 +274,63 @@ void reconheceplayer(char* mov, int* varrepeat, Dir dir, char table[20][40], int
     }
 }
 
+void lerlinhacoluna(int *tamtabley, int *tamtablex, FILE *mapa){
+    *tamtablex = *tamtabley = 0;
+    char firstlinha[100];
+    fgets(firstlinha, 100, mapa);
+    *tamtablex = strlen(firstlinha) - 1;
 
+    while(fgets(firstlinha, 100, mapa) != NULL){
+        (*tamtabley)++;
+    }
+    rewind(mapa);
+    (*tamtabley)++;
+}
 
+int menuprincipal(){
+    int menu = 0;
+    if (animacaomenuprincipal() == 2)
+        return 2;
+    while (menu == 0){
 
+        menu = 1;
+    }
+}
+
+int animacaomenuprincipal(){
+    FILE * menu;
+    menu = fopen("opening.txt", "r");
+    
+    if (menu == NULL){
+        printf("erro na abertura da opening\n");
+        getch();
+        return 2;
+    }
+    
+    char charizarde[100];
+    fgets(charizarde, 100, menu);
+    char fim[3] = "<>";
+    for(; strcmp(charizarde, fim) != 0; fgets(charizarde, 100, menu)){
+        Sleep(10);
+        printf("%s", charizarde);
+    }
+    getch();
+    system("cls");
+}
 
 
 
 
 int main() {
-    menuprincipal();
+    if (menuprincipal() == 2)
+        return 2;
 
-    char table[20][40]; //inicialização da tabela do jogo, acima representação de dinâmico
+    char **table; //inicialização da tabela do jogo
     char mov; //valor do botão recebido do teclado
     int maxvida; //quantidade de vida MÁXIMA
     int vida; //quantidade de vida ATUAL
     Dir dir; //inicialização do enum
-    int pontos = 0;
+    int pontos = 0; //pontos
     int coordx = 1; //coordenada do personagem em X
     int coordy = 1; //coordenada do personagem em Y
     int varrepeat = 1; //para o laço de repetição do while
@@ -310,33 +345,28 @@ int main() {
     int tamtablex = 0; //inicialização da altura da tabela do jogo
     int tamtabley = 0; //inicialização do comprimento da tabela do jogo
 
-    itoa(mapacoordx, mapacoordxchar,10);
-    itoa(mapacoordy, mapacoordychar,10);
+    itoa(mapacoordx, mapacoordxchar, 10);
+    itoa(mapacoordy, mapacoordychar, 10);
     strcpy(nomemapa,"mapa");
     strcat(nomemapa,mapacoordxchar);
     strcat(nomemapa,mapacoordychar);
     strcat(nomemapa,".txt");
-    printf("%s\n", nomemapa);
 
     FILE * mapa;
     mapa = fopen(nomemapa, "r");
     if (mapa == NULL){
-        printf("erro na leitura do arquivo\n");
+        printf("erro na leitura do arquivo, string:%s\n", nomemapa);
         getch();
         return 2;
     }
-
-    tamtablex = tamtabley = 0;
-    char firstlinha[100];
-    fgets(firstlinha, 100, mapa);
-    tamtablex = strlen(firstlinha) - 1;
-
-    while(fgets(firstlinha, 100, mapa) != NULL){
-        tamtabley++;
-    }
-    rewind(mapa);
-    tamtabley++;
-
+    
+    lerlinhacoluna(&tamtabley, &tamtablex, mapa);
+    
+    table = (char**) malloc(tamtabley * sizeof(char*));
+    for(int i=0; i < tamtabley; i++)
+        table[i] = (char*) malloc(tamtablex * sizeof(char));
+    
+    
 /*
     for (int i = 0; i < 20; i++) {
         for (int j = 0; j < 40; j++) {
@@ -374,8 +404,8 @@ int main() {
         shooteded = 0;
 
         printapontosecoords(&pontos, coordx, coordy);
-        printajogo(table);
-        printavida(vida, maxvida);
+        printajogo(table, tamtabley, tamtablex);
+        printavida(&vida, &maxvida);
         printacontroles(&mov);
 
         reconheceplayer(&mov, &varrepeat, dir, table, &coordx, &coordy, &pontos, &vida, &hithead, &shooteded);
@@ -391,3 +421,4 @@ int main() {
     printf("\n[[[[JOGO FECHADO]]]]\n(pressione algo para fechar)"); //caso o player digite 'Q' e saia do jogo
     return 0; //fim
 }
+
