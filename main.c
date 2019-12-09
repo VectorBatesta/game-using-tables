@@ -152,12 +152,12 @@ void shoot(Dir dir, char table[20][40], int coordx, int coordy, int* pontos){
     return;        //o player é renderizado em ^ > V <
 }
 
-void printavida(int* vida, int maxvida){
-    if(vida > maxvida)
-        vida = maxvida;
+void printavida(int *vida, int maxvida){
+    if(*vida > maxvida)
+        *vida = maxvida;
 
     printf("\nVIDA [");
-    for(int quantvida = vida; maxvida > 0; maxvida--){
+    for(int quantvida = *vida; maxvida > 0; maxvida--){
         if (quantvida > 0){
             printf("O");
             quantvida--;
@@ -199,7 +199,6 @@ void printajogo(char **table, int tamtablex, int tamtabley){
         printf("\n");
         for (int j = 0; j < tamtablex; j++) {
             printf("%c", table[i][j]); //printa a tabela na tela
-            srand(time(NULL));
             if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
                 table[i][j] = '_';
         }
@@ -237,7 +236,7 @@ void selecionadificuldade(int* maxvida, int* vida){
     *vida = *maxvida;
 }
 
-void reconheceplayer(char* mov, int* varrepeat, Dir dir, char table[20][40], int* coordx, int* coordy, int* pontos, int* vida, int* hithead, int* shooteded){
+void reconheceplayer(char* mov, int* varrepeat, Dir dir, char **table, int* coordx, int* coordy, int* pontos, int* vida, int* hithead, int* shooteded){
     switch(*mov){
         case 'q':
             *varrepeat = 0; //acaba com o laço de repetição maior
@@ -285,6 +284,8 @@ void lerlinhacoluna(int *tamtabley, int *tamtablex, FILE *mapa){
     }
     rewind(mapa);
     (*tamtabley)++;
+    
+    printf("\n\n%i,%i\n\n", *tamtablex, *tamtabley);
 }
 
 int menuprincipal(){
@@ -318,6 +319,15 @@ int animacaomenuprincipal(){
     system("cls");
 }
 
+void lertable(FILE *mapa, int tamtabley, int tamtablex, char **table){
+    char aux;
+    for (int i = 0; i < tamtabley; i++){
+        for (int j = 0; j < tamtablex; j++){
+            aux = fgetc(mapa);
+            table[i][j] = aux;
+        }
+    }
+}
 
 
 
@@ -365,6 +375,8 @@ int main() {
     table = (char**) malloc(tamtabley * sizeof(char*));
     for(int i=0; i < tamtabley; i++)
         table[i] = (char*) malloc(tamtablex * sizeof(char));
+    
+    lertable(mapa, tamtabley, tamtablex, table);
     
     
 /*
