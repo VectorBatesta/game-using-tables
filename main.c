@@ -195,9 +195,9 @@ void printacontroles(char* mov){
 }
 
 void printajogo(char **table, int tamtablex, int tamtabley){
-    for (int i = 0; i < tamtabley; i++) {
+    for (int i = 0; i < tamtablex; i++) {
         printf("\n");
-        for (int j = 0; j < tamtablex; j++) {
+        for (int j = 0; j < tamtabley; j++) {
             printf("%c", table[i][j]); //printa a tabela na tela
             if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
                 table[i][j] = '_';
@@ -321,10 +321,12 @@ int animacaomenuprincipal(){
 
 void lertable(FILE *mapa, int tamtabley, int tamtablex, char **table){
     char aux;
-    for (int i = 0; i < tamtabley; i++){
-        for (int j = 0; j < tamtablex; j++){
+    rewind(mapa);
+    for (int i = 0; i < tamtablex; i++){
+        for (int j = 0; j < tamtabley; j++){
             aux = fgetc(mapa);
-            table[i][j] = aux;
+            if (aux != '\n')
+                table[i][j] = aux;
         }
     }
 }
