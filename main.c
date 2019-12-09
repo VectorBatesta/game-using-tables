@@ -194,17 +194,6 @@ void printacontroles(char* mov){
     *mov = getch(); //pega o movimento do player do teclado q ele digitar, recebe a letra q tbm caso o player queira sair do jogo
 }
 
-void printajogo(char **table, int tamtablex, int tamtabley){
-    for (int i = 0; i < tamtablex; i++) {
-        printf("\n");
-        for (int j = 0; j < tamtabley; j++) {
-            printf("%c", table[i][j]); //printa a tabela na tela
-            if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
-                table[i][j] = '_';
-        }
-    }
-}
-
 void printapontosecoords(int* pontos, int coordx, int coordy){
     if (*pontos < 0)
         *pontos = 0;
@@ -290,11 +279,82 @@ void lerlinhacoluna(int *tamtabley, int *tamtablex, FILE *mapa){
 
 int menuprincipal(){
     int menu = 0;
+    int seta = 1;
+    int comeco = 1;
+    char selecionne = 'a';
+    
     if (animacaomenuprincipal() == 2)
         return 2;
+    
+    
     while (menu == 0){
+        printf("\n\n\n\b<<<<<<<<<<MENU PRINCIPAL>>>>>>>>>>\n\n");
+        
+        if(seta == 1)
+            printf("<- ");
+        else
+            printf("   ");
+        printf("START GAME");
+        if(seta == 1)
+            printf(" ->\n");
+        else
+            printf("   \n");
 
-        menu = 1;
+        if(seta == 2)
+            printf("<- ");
+        else
+            printf("   ");
+        printf("OPTIONS");
+        if(seta == 2)
+            printf(" ->\n");
+        else
+            printf("   \n");
+
+        if(seta == 3)
+            printf("<- ");
+        else
+            printf("   ");
+        printf("QUIT GAME");
+        if(seta == 3)
+            printf(" ->\n");
+        else
+            printf("   \n");
+        
+        printf("\n"
+               "|------controles------|\n"
+               "| CIMA = W            |\n"
+               "| SELECIONAR = ESPACO |\n"
+               "| BAIXO = S           |\n"
+               "|---------------------|");
+
+        ////////////////////////////////////
+        
+        selecionne = getch();
+        
+        if (selecionne == 'q'){
+            return 2;
+        }
+        else if (selecionne == 'w')
+            if (seta == 1);
+            else
+                seta--;
+        else if(selecionne == 's')
+            if (seta == 3);
+            else
+                seta++;
+        else if(selecionne == ' ')
+            switch(seta){
+                case 1:
+                    menu = 1;
+                    break;
+                case 2:
+                    comeco = 0;
+                    break;
+                case 3:
+                    return 2;
+                    break;
+            }
+        system("cls");
     }
 }
 
@@ -327,6 +387,17 @@ void lertable(FILE *mapa, int tamtabley, int tamtablex, char **table){
             aux = fgetc(mapa);
             if (aux != '\n')
                 table[i][j] = aux;
+        }
+    }
+}
+
+void printajogo(char **table, int tamtablex, int tamtabley){
+    for (int i = 0; i < tamtablex; i++) {
+        printf("\n");
+        for (int j = 0; j < tamtabley; j++) {
+            printf("%c", table[i][j]); //printa a tabela na tela
+            if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
+                table[i][j] = '_';
         }
     }
 }
@@ -419,7 +490,7 @@ int main() {
 
         printapontosecoords(&pontos, coordx, coordy);
         printajogo(table, tamtabley, tamtablex);
-        printavida(&vida, &maxvida);
+        printavida(&vida, maxvida);
         printacontroles(&mov);
 
         reconheceplayer(&mov, &varrepeat, dir, table, &coordx, &coordy, &pontos, &vida, &hithead, &shooteded);
