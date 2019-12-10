@@ -262,21 +262,6 @@ void reconheceplayer(char* mov, int* varrepeat, Dir dir, char **table, int* coor
     }
 }
 
-void lerlinhacoluna(int *tamtabley, int *tamtablex, FILE *mapa){
-    *tamtablex = *tamtabley = 0;
-    char firstlinha[100];
-    fgets(firstlinha, 100, mapa);
-    *tamtablex = strlen(firstlinha) - 1;
-
-    while(fgets(firstlinha, 100, mapa) != NULL){
-        (*tamtabley)++;
-    }
-    rewind(mapa);
-    (*tamtabley)++;
-    
-    printf("\n\n%i,%i\n\n", *tamtablex, *tamtabley);
-}
-
 int menuprincipal(){
     int menu = 0;
     int seta = 1;
@@ -379,31 +364,6 @@ int animacaomenuprincipal(){
     system("cls");
 }
 
-void lertable(FILE *mapa, int tamtabley, int tamtablex, char **table){
-    char aux;
-    rewind(mapa);
-    for (int i = 0; i < tamtablex; i++){
-        for (int j = 0; j < tamtabley; j++){
-            aux = fgetc(mapa);
-            if (aux != '\n')
-                table[i][j] = aux;
-        }
-    }
-}
-
-void printajogo(char **table, int tamtablex, int tamtabley){
-    for (int i = 0; i < tamtablex; i++) {
-        printf("\n");
-        for (int j = 0; j < tamtabley; j++) {
-            printf("%c", table[i][j]); //printa a tabela na tela
-            if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
-                table[i][j] = '_';
-        }
-    }
-}
-
-
-
 int main() {
     if (menuprincipal() == 2)
         return 2;
@@ -425,8 +385,9 @@ int main() {
     char nomemapa[12]; //string para ser concatenada e ser lida para o arquivo
     char mapacoordxchar[2]; //mesmo q mapacoordx porem agora em char
     char mapacoordychar[2]; //mesmo q mapacoordy porem agora em char
-    int tamtablex = 0; //inicialização da altura da tabela do jogo
-    int tamtabley = 0; //inicialização do comprimento da tabela do jogo
+    
+    int tamtablex = 0; //inicialização da comprimento da tabela do jogo
+    int tamtabley = 0; //inicialização do altura da tabela do jogo
 
     itoa(mapacoordx, mapacoordxchar, 10);
     itoa(mapacoordy, mapacoordychar, 10);
@@ -443,14 +404,33 @@ int main() {
         return 2;
     }
     
-    lerlinhacoluna(&tamtabley, &tamtablex, mapa);
+    tamtablex = tamtabley = 0;
+    char firstlinha[100];
+    fgets(firstlinha, 100, mapa);
+    tamtablex = strlen(firstlinha) - 1;
+
+    while(fgets(firstlinha, 100, mapa) != NULL){
+        tamtabley++;
+    }
+    rewind(mapa);
+    tamtabley++;
+    
+    printf("\n\n%i,%i\n\n", tamtablex, tamtabley);
     
     table = (char**) malloc(tamtabley * sizeof(char*));
     for(int i=0; i < tamtabley; i++)
         table[i] = (char*) malloc(tamtablex * sizeof(char));
+    //table[21][13]
+    //      y   x
     
-    lertable(mapa, tamtabley, tamtablex, table);
-    
+    char aux;
+    for (int i = 0; i < tamtabley; i++){
+        for (int j = 0; j < tamtablex; j++){
+            aux = fgetc(mapa);
+            if (aux != '\n')
+                table[i][j] = aux;
+        }
+    }
     
 /*
     for (int i = 0; i < 20; i++) {
@@ -489,7 +469,16 @@ int main() {
         shooteded = 0;
 
         printapontosecoords(&pontos, coordx, coordy);
-        printajogo(table, tamtabley, tamtablex);
+        
+        for (int i = 0; i < tamtabley; i++) {
+            printf("\n");
+            for (int j = 0; j < tamtablex; j++) {
+                printf("%c", table[i][j]); //printa a tabela na tela
+                if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
+                    table[i][j] = '_';
+            }
+        }
+        
         printavida(&vida, maxvida);
         printacontroles(&mov);
 
