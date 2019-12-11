@@ -186,12 +186,11 @@ void gameover(){
 "\n                 Y            Y                                                     Y");
 }
 
-void printacontroles(char* mov){
+void printacontroles(char mov){
     printf("\n|Q|W| ]\n"
              "|A S D|\n"
              "[SPACE to SHOOT]\n"
              "[Q to QUIT]\n"); //printa os controles
-    *mov = getch(); //pega o movimento do player do teclado q ele digitar, recebe a letra q tbm caso o player queira sair do jogo
 }
 
 void printapontosecoords(int* pontos, int coordx, int coordy){
@@ -225,8 +224,8 @@ void selecionadificuldade(int* maxvida, int* vida){
     *vida = *maxvida;
 }
 
-void reconheceplayer(char* mov, int* varrepeat, Dir dir, char **table, int* coordx, int* coordy, int* pontos, int* vida, int* hithead, int* shooteded){
-    switch(*mov){
+void reconheceplayer(char mov, int* varrepeat, Dir dir, char **table, int* coordx, int* coordy, int* pontos, int* vida, int* hithead, int* shooteded){
+    switch(mov){
         case 'q':
             *varrepeat = 0; //acaba com o laço de repetição maior
             break;
@@ -404,16 +403,19 @@ int main() {
         return 2;
     }
     
-    tamtablex = tamtabley = 0;
-    char firstlinha[100];
-    fgets(firstlinha, 100, mapa);
-    tamtablex = strlen(firstlinha) - 1;
-
-    while(fgets(firstlinha, 100, mapa) != NULL){
-        tamtabley++;
-    }
+    fscanf(mapa ,"%i.%i", &tamtablex, &tamtabley);
     rewind(mapa);
-    tamtabley++;
+    
+//    tamtablex = tamtabley = 0;
+//    char firstlinha[100];
+//    fgets(firstlinha, 100, mapa);
+//    tamtablex = strlen(firstlinha) - 1;
+//
+//    while(fgets(firstlinha, 100, mapa) != NULL){
+//        tamtabley++;
+//    }
+//    rewind(mapa);
+//    tamtabley++;
     
     printf("\n\n%i,%i\n\n", tamtablex, tamtabley);
     
@@ -432,25 +434,23 @@ int main() {
         }
     }
     
-/*
-    for (int i = 0; i < 20; i++) {
-        for (int j = 0; j < 40; j++) {
-            if(i == 0 || i == 19 || j == 0 || j == 39)
+    for (int i = 0; i < tamtabley; i++) {
+        for (int j = 0; j < tamtablex; j++) {
+            if(i == 0 || i == tamtabley-1 || j == 0 || j == tamtablex-1)
                 table[i][j] = 'X'; //geração da tabela do jogo para ter paredes nas extremidades
             else
                 table[i][j] = '_'; //lugar onde o player pode se mecher
         }
     }
     srand(time(NULL));
-    for (int i = 0; i < 20; i++){
-        for (int j = 0; j < 40; j++){
+    for (int i = 0; i < tamtabley; i++){
+        for (int j = 0; j < tamtablex; j++){
             if(table[i][j] == '_' && rand()%10 == 0) //aqui é gerado aleatoriamente vários blocos, que é K
                 table[i][j] = 'K';
             if(table[i][j] == '_' && rand()%100 == 0)
                 table[i][j] = 'E';
         }
     }
-*/
 
     table[coordy][coordx] = '>'; //renderiza o player [quando o jogo é iniciado] olhando para direita
 
@@ -473,16 +473,17 @@ int main() {
         for (int i = 0; i < tamtabley; i++) {
             printf("\n");
             for (int j = 0; j < tamtablex; j++) {
-                printf("%c", table[i][j]); //printa a tabela na tela
+                printf("%c", table[i][j]);
                 if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
                     table[i][j] = '_';
             }
         }
         
         printavida(&vida, maxvida);
-        printacontroles(&mov);
-
-        reconheceplayer(&mov, &varrepeat, dir, table, &coordx, &coordy, &pontos, &vida, &hithead, &shooteded);
+        printacontroles(mov);
+        mov = getch(); //pega o movimento do player do teclado q ele digitar, recebe a letra q tbm caso o player queira sair do jogo
+        
+        reconheceplayer(mov, &varrepeat, dir, table, &coordx, &coordy, &pontos, &vida, &hithead, &shooteded);
 
         if(vida == 0){
             gameover();
