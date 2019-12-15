@@ -2,7 +2,7 @@
 XXXXXXXXX
 X_______X
 X_______X
-X_______X
-X________
+X____P__X
+X___P_P__
 X_______X
 XXXXXXXXX
