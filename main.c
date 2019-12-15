@@ -23,7 +23,6 @@ int checkmovable(Dir dir, char **table, int antesx, int antesy, int* pontos, int
             else if(table[depoisy][depoisx] == 'E'){
                 depoisy = antesy;
                 (*vida)--;
-                moveu = 2;
             }
             else
                 moveu = 1;
@@ -38,7 +37,6 @@ int checkmovable(Dir dir, char **table, int antesx, int antesy, int* pontos, int
             else if(table[depoisy][depoisx] == 'E'){
                 depoisx = antesx;
                 (*vida)--;
-                moveu = 2;
             }
             else
                 moveu = 1;
@@ -53,7 +51,6 @@ int checkmovable(Dir dir, char **table, int antesx, int antesy, int* pontos, int
             else if(table[depoisy][depoisx] == 'E'){
                 depoisy = antesy;
                 (*vida)--;
-                moveu = 2;
             }
             else
                 moveu = 1;
@@ -68,7 +65,6 @@ int checkmovable(Dir dir, char **table, int antesx, int antesy, int* pontos, int
             else if(table[depoisy][depoisx] == 'E'){
                 depoisx = antesx;
                 (*vida)--;
-                moveu = 2;
             }
             else
                 moveu = 1;
@@ -81,9 +77,8 @@ int checkmovable(Dir dir, char **table, int antesx, int antesy, int* pontos, int
     if (moveu == 1){
         table[antesy][antesx] = '_';
         (*pontos)--;
-        return 1;
     }
-    return 0;
+    return moveu;
 }
 
 void shoot(Dir dir, char **table, int coordx, int coordy, int * pontos, int tamtabley, int tamtablex){
@@ -260,6 +255,7 @@ int selecionadificuldade(int* maxvida, int* vida){
 }
 
 int reconheceplayer(char mov, int* varrepeat, Dir *dir, char **table, int* coordx, int* coordy, int* pontos, int* vida, int* hithead, int* shooteded, int *everything, int *wongame){
+    int returned = 0;
     switch(mov){
         case 'q':
             *varrepeat = 0; //acaba com o laço de repetição maior
@@ -267,25 +263,29 @@ int reconheceplayer(char mov, int* varrepeat, Dir *dir, char **table, int* coord
             break;
         case 'w':
             *dir = CIMA;
-            if(checkmovable(*dir, table, *coordx, *coordy, &(*pontos), &(*vida), &(*wongame)) == 0) //se não conseguir se mecher para [dir], variavel de não cosneguir se mecher é positiva
+            returned = checkmovable(*dir, table, *coordx, *coordy, &(*pontos), &(*vida), &(*wongame));
+            if(returned == 0) //se não conseguir se mecher para [dir], variavel de não cosneguir se mecher é positiva
                 *hithead = 1;
             else (*coordy)--; //caso consiga se mecher, a variável da respectiva coordenada é alterada [o personagem se meche]
             break;
         case 's':
             *dir = BAIXO;
-            if(checkmovable(*dir, table, *coordx, *coordy, &(*pontos), &(*vida), &(*wongame)) == 0)
+            returned = checkmovable(*dir, table, *coordx, *coordy, &(*pontos), &(*vida), &(*wongame));
+            if(returned == 0)
                 *hithead = 1;
             else (*coordy)++;
             break;
         case 'a':
             *dir = ESQUERDA;
-            if(checkmovable(*dir, table, *coordx, *coordy, &(*pontos), &(*vida), &(*wongame)) == 0)
+            returned = checkmovable(*dir, table, *coordx, *coordy, &(*pontos), &(*vida), &(*wongame));
+            if(returned == 0)
                 *hithead = 1;
             else (*coordx)--;
             break;
         case 'd':
             *dir = DIREITA;
-            if(checkmovable(*dir, table, *coordx, *coordy, &(*pontos), &(*vida), &(*wongame)) == 0)
+            returned = checkmovable(*dir, table, *coordx, *coordy, &(*pontos), &(*vida), &(*wongame));
+            if(returned == 0)
                 *hithead = 1;
             else (*coordx)++;
             break;
@@ -454,13 +454,176 @@ int wongamew(int pontos){
     return 10;
 }
 
+typedef struct{
+    int x;
+    int y;
+}inimigo;
+
+void movinimigo(char **table, int coordy, int coordx, inimigo *vetorinimigo, int quantinimigo){
+    int decisivox;
+    int decisivoy;
+    
+    for(int w = 0; w < quantinimigo; w++){
+        int tablex = vetorinimigo[w].x;
+        int tabley = vetorinimigo[w].y;
+        int deltay = tabley - coordy;
+        int deltax = tablex - coordx;
+        
+        if(deltay > 0 && deltax > 0){ //cima esquerda
+            decisivoy = tabley - 1;
+            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
+                table[decisivoy][tablex] = 'E';
+                table[tabley][tablex] = '_';
+            }
+            else{
+                decisivox = tablex - 1;
+                if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
+                    table[tabley][decisivox] = 'E';
+                    table[tabley][tablex] = '_';
+                }
+            }
+        }
+        else if(deltay > 0 && deltax < 0){ //cima direita
+            decisivoy = tabley - 1;
+            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
+                table[decisivoy][tablex] = 'E';
+                table[tabley][tablex] = '_';
+            }
+            else{
+                decisivox = tablex + 1;
+                if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
+                    table[tabley][decisivox] = 'E';
+                    table[tabley][tablex] = '_';
+                }
+            }
+        }   
+        else if(deltay < 0 && deltax > 0){ //baixo esquerda
+            decisivoy = tabley + 1;
+            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
+                table[decisivoy][tablex] = 'E';
+                table[tabley][tablex] = '_';
+            }
+            else{
+                decisivox = tablex - 1;
+                if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
+                    table[tabley][decisivox] = 'E';
+                    table[tabley][tablex] = '_';
+                }
+            }
+        }
+        else if(deltay < 0 && deltax < 0){ //baixo direita
+            decisivoy = tabley + 1;
+            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
+                table[decisivoy][tablex] = 'E';
+                table[tabley][tablex] = '_';
+            }
+            else{
+                decisivox = tablex + 1;
+                if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
+                    table[tabley][decisivox] = 'E';
+                    table[tabley][tablex] = '_';
+                }
+            }
+        }   
+        else if(deltay > 1 && deltax == 0){ // cima
+            decisivoy = tabley - 1;
+            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
+                table[decisivoy][tablex] = 'E';
+                table[tabley][tablex] = '_';
+            }
+            else{
+                decisivox = tablex - 1;
+                if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
+                    table[tabley][decisivox] = 'E';
+                    table[tabley][tablex] = '_';
+                }
+                else{
+                    decisivox = tablex + 2;
+                    if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
+                        table[tabley][decisivox] = 'E';
+                        table[tabley][tablex] = '_';
+                    }
+                }
+            }
+        }   
+        else if(deltay < -1 && deltax == 0){ // baixo
+            decisivoy = tabley + 1;
+            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
+                table[decisivoy][tablex] = 'E';
+                table[tabley][tablex] = '_';
+            }
+            else{
+                decisivox = tablex - 1;
+                if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
+                    table[tabley][decisivox] = 'E';
+                    table[tabley][tablex] = '_';
+                }
+                else{
+                    decisivox = tablex + 2;
+                    if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
+                        table[tabley][decisivox] = 'E';
+                        table[tabley][tablex] = '_';
+                    }
+                }
+            }
+        }   
+        else if(deltay == 0 && deltax > 1){ // esquerda
+            decisivox = tablex - 1;
+            if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
+                table[tabley][decisivox] = 'E';
+                table[tabley][tablex] = '_';
+            }
+            else{
+                decisivoy = tabley + 1;
+                if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
+                    table[decisivoy][tablex] = 'E';
+                    table[tabley][tablex] = '_';
+                }
+                else{
+                    decisivoy = tabley - 2;
+                    if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
+                        table[decisivoy][tablex] = 'E';
+                        table[tabley][tablex] = '_';
+                    }
+                }
+            }
+        }   
+        else if(deltay == 0 && deltax < -1){ // direita
+            decisivox = tablex + 1;
+            if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
+                table[tabley][decisivox] = 'E';
+                table[tabley][tablex] = '_';
+            }
+            else{
+                decisivoy = tabley + 1;
+                if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
+                    table[decisivoy][tablex] = 'E';
+                    table[tabley][tablex] = '_';
+                }
+                else{
+                    decisivoy = tabley - 2;
+                    if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
+                        table[decisivoy][tablex] = 'E';
+                        table[tabley][tablex] = '_';
+                    }
+                }
+            }
+        }
+    }
+
+
+    // deltay+ deltax+      deltay+ deltax=      deltay+ deltax-
+    // deltay= deltax+             E             deltay= deltax-
+    // deltay- deltax+      deltay- deltax=      deltay- deltax-
+}
 
 
 
+//            for (int i = 0; i < tamtabley; i++) {
+//                printf("\n");
+//                for (int j = 0; j < tamtablex; j++) {
 
-
-
-
+// movinimigo(table, i, j, coordy, coordx);
 
 
 int main() {
@@ -475,6 +638,7 @@ int main() {
     int maxvida; //quantidade de vida MÁXIMA
     int vida; //quantidade de vida ATUAL
     Dir dir = DIREITA; //inicialização do enum
+    inimigo *vetorinimigo;
     int pontos = 0; //pontos
     int coordx = 1; //coordenada do personagem em X
     int coordy = 1; //coordenada do personagem em Y
@@ -538,17 +702,17 @@ int main() {
             printf("\n");
         }
 
-        srand(time(NULL));
-        if (mapacoordx != 3 && mapacoordy != 2){
-            for (int i = 0; i < tamtabley-1; i++){
-                for (int j = 0; j < tamtablex-1; j++){
-                    if(table[i][j] == '_' && rand()% dificuldade*2 == 0) //aqui é gerado aleatoriamente vários blocos, que é K 
-                        table[i][j] = 'K';
-                    if(table[i][j] == '_' && rand()% dificuldade == 0)
-                        table[i][j] = 'E';
-                }
-            }
-        }
+//        srand(time(NULL));
+//        if (mapacoordx != 3 && mapacoordy != 2){
+//            for (int i = 0; i < tamtabley-1; i++){
+//                for (int j = 0; j < tamtablex-1; j++){
+//                    if(table[i][j] == '_' && rand()% dificuldade*2 == 0) //aqui é gerado aleatoriamente vários blocos, que é K 
+//                        table[i][j] = 'K';
+//                    if(table[i][j] == '_' && rand()% dificuldade == 0)
+//                        table[i][j] = 'E';
+//                }
+//            }
+//        }
 
         table[coordy][coordx] = '>'; //renderiza o player [quando o jogo é iniciado] olhando para direita
         
@@ -601,12 +765,29 @@ int main() {
 
             printapontosecoords(&pontos, coordx, coordy, mododev);
 
+            int quantinimigo = 0;
+            
             for (int i = 0; i < tamtabley; i++) {
                 printf("\n");
                 for (int j = 0; j < tamtablex; j++) {
                     printf("%c", table[i][j]);
                     if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
                         table[i][j] = '_';
+                    if(table[i][j] == 'E')
+                        quantinimigo++;
+                }
+            }
+            
+            vetorinimigo = (inimigo*) malloc(quantinimigo * sizeof(inimigo));
+            
+            int quanti = 0;
+            for (int i = 0; i < tamtabley; i++) {
+                for (int j = 0; j < tamtablex; j++) {
+                    if(table[i][j] == 'E'){
+                        vetorinimigo[quanti].y = i;
+                        vetorinimigo[quanti].x = j;
+                        quanti++;
+                    }
                 }
             }
 
@@ -617,6 +798,8 @@ int main() {
             if (reconheceplayer(mov, &varrepeat, &dir, table, &coordx, &coordy, &pontos, &vida, &hithead, &shooteded, &everything, &wongame) == 7)
                 shoot(dir, table, coordx, coordy, &pontos, tamtabley, tamtablex); //abre função para atirar na frente do player
 
+            movinimigo(table, coordy, coordx, vetorinimigo, quantinimigo);
+            
             if (coordy == tamtabley-1 || coordy == 0 || coordx == tamtablex-1 || coordy == 0){
                 varrepeat = 0;
                 fclose(mapa);
