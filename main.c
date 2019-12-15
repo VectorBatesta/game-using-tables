@@ -18,9 +18,9 @@ int checkmovable(Dir dir, char **table, int antesx, int antesy, int* pontos, int
             depoisy--;
             if(table[depoisy][depoisx] == 'W')
                 *wongame = 1;
-            else if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K') //|| quer dizer OU, se quiser dizer E, só colocar && (...) se o player tentar mecher o personagem para um bloco[K] ou parede[X], a função retorna negativo
+            else if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K' || table[depoisy][depoisx] == 'E') //|| quer dizer OU, se quiser dizer E, só colocar && (...) se o player tentar mecher o personagem para um bloco[K] ou parede[X], a função retorna negativo
                 depoisy = antesy;
-            else if(table[depoisy][depoisx] == 'E'){
+            else if(table[depoisy][depoisx] == 'A'){
                 depoisy = antesy;
                 (*vida)--;
             }
@@ -32,9 +32,9 @@ int checkmovable(Dir dir, char **table, int antesx, int antesy, int* pontos, int
             depoisx--;
             if(table[depoisy][depoisx] == 'W')
                 *wongame = 1;
-            else if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
+            else if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K' || table[depoisy][depoisx] == 'E')
                 depoisx = antesx;
-            else if(table[depoisy][depoisx] == 'E'){
+            else if(table[depoisy][depoisx] == 'A'){
                 depoisx = antesx;
                 (*vida)--;
             }
@@ -46,9 +46,9 @@ int checkmovable(Dir dir, char **table, int antesx, int antesy, int* pontos, int
             depoisy++;
             if(table[depoisy][depoisx] == 'W')
                 *wongame = 1;
-            else if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
+            else if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K' || table[depoisy][depoisx] == 'E')
                 depoisy = antesy;
-            else if(table[depoisy][depoisx] == 'E'){
+            else if(table[depoisy][depoisx] == 'A'){
                 depoisy = antesy;
                 (*vida)--;
             }
@@ -60,9 +60,9 @@ int checkmovable(Dir dir, char **table, int antesx, int antesy, int* pontos, int
             depoisx++;
             if(table[depoisy][depoisx] == 'W')
                 *wongame = 1;
-            else if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K')
+            else if(table[depoisy][depoisx] == 'X' || table[depoisy][depoisx] == 'K' || table[depoisy][depoisx] == 'E')
                 depoisx = antesx;
-            else if(table[depoisy][depoisx] == 'E'){
+            else if(table[depoisy][depoisx] == 'A'){
                 depoisx = antesx;
                 (*vida)--;
             }
@@ -459,7 +459,7 @@ typedef struct{
     int y;
 }inimigo;
 
-void movinimigo(char **table, int coordy, int coordx, inimigo *vetorinimigo, int quantinimigo){
+void movinimigo(char **table, int coordy, int coordx, inimigo *vetorinimigo, int quantinimigo, int *vida){
     int decisivox;
     int decisivoy;
     
@@ -609,6 +609,11 @@ void movinimigo(char **table, int coordy, int coordx, inimigo *vetorinimigo, int
                 }
             }
         }
+        
+        if(deltax > -2 && deltax < 2 && deltay == 0)
+            (*vida)--;
+        if(deltay > -2 && deltay < 2 && deltax == 0)
+            (*vida)--;
     }
 
 
@@ -798,7 +803,7 @@ int main() {
             if (reconheceplayer(mov, &varrepeat, &dir, table, &coordx, &coordy, &pontos, &vida, &hithead, &shooteded, &everything, &wongame) == 7)
                 shoot(dir, table, coordx, coordy, &pontos, tamtabley, tamtablex); //abre função para atirar na frente do player
 
-            movinimigo(table, coordy, coordx, vetorinimigo, quantinimigo);
+            movinimigo(table, coordy, coordx, vetorinimigo, quantinimigo, &vida);
             
             if (coordy == tamtabley-1 || coordy == 0 || coordx == tamtablex-1 || coordy == 0){
                 varrepeat = 0;
