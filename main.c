@@ -7,6 +7,13 @@
 
 #define U_16 0x20000  //U-16 text mode, for the text blocks -> ignorar isso, serve apenas caso tenha caractere especial
 
+typedef struct{
+    int x;
+    int y;
+}inimigo;
+
+//     vetorinimigo = (inimigo*) malloc(quantinimigo * sizeof(inimigo));
+
 typedef enum {CIMA, BAIXO, DIREITA, ESQUERDA} Dir;
 
 int checkmovable(Dir dir, char **table, int antesx, int antesy, int* pontos, int* vida, int *wongame, int *bala){ //portas lógicas para movimentação: para cima, para baixo, etc
@@ -485,12 +492,6 @@ int wongamew(int pontos){
     return 10;
 }
 
-typedef struct{
-    int x;
-    int y;
-}inimigo;
-
-//     vetorinimigo = (inimigo*) malloc(quantinimigo * sizeof(inimigo));
 
 void movinimigo(char **table, int coordy, int coordx, inimigo *vetorinimigo, int quantinimigo, int *vida){
     int decisivox = 0;
@@ -687,14 +688,14 @@ int main() {
     int maxvida; //quantidade de vida MÁXIMA
     int vida; //quantidade de vida ATUAL
     Dir dir = DIREITA; //inicialização do enum
-    inimigo *vetorinimigo;
     int pontos = 0; //pontos
     int coordx = 1; //coordenada do personagem em X
     int coordy = 1; //coordenada do personagem em Y
     int varrepeat = 1; //para o laço de repetição do while
     int hithead = 0; //caso o player tente se mecher em um lugar que não consiga se mecher
     int shooteded = 0; //para saber se atirou ou não
-
+    inimigo *vetorinimigo;
+    
     int mapacoordx = 0; //inicialização do mapa em x=0
     int mapacoordy = 0; //inicialização do mapa em y=0
     char nomemapa[12]; //string para ser concatenada e ser lida para o arquivo
@@ -830,7 +831,7 @@ int main() {
             }
             
             vetorinimigo = (inimigo*) malloc(quantinimigo * sizeof(inimigo));
-
+            
             printavida(&vida, maxvida);
             printabalas(sexpistols);
             printacontroles(mov);
@@ -853,8 +854,6 @@ int main() {
             
             if(quanti != 0)
                 movinimigo(table, coordy, coordx, vetorinimigo, quantinimigo, &vida);
-            
-            free(vetorinimigo);
             
             if (coordy == tamtabley-1 || coordy == 0 || coordx == tamtablex-1 || coordy == 0){
                 varrepeat = 0;
