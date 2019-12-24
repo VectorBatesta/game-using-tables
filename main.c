@@ -493,163 +493,176 @@ int wongamew(int pontos){
 }
 
 
-void movinimigo(char **table, int coordy, int coordx, inimigo *vetorinimigo, int quantinimigo, int *vida){
+void movinimigo(char **table, int coordy, int coordx, int tamtabley, int tamtablex, int *vida){
     int decisivox = 0;
     int decisivoy = 0;
     
-    for(int w = 0; w < quantinimigo; w++){
-        int tablex = vetorinimigo[w].x;
-        int tabley = vetorinimigo[w].y;
-        int deltay = tabley - coordy;
-        int deltax = tablex - coordx;
-        
-        if(deltay > 0 && deltax > 0){ //cima esquerda
-            decisivoy = tabley - 1;
-            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
-                table[decisivoy][tablex] = 'E';
-                table[tabley][tablex] = '_';
-            }
-            else{
-                decisivox = tablex - 1;
-                if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
-                    table[tabley][decisivox] = 'E';
-                    table[tabley][tablex] = '_';
-                }
-            }
-        }
-        else if(deltay > 0 && deltax < 0){ //cima direita
-            decisivoy = tabley - 1;
-            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
-                table[decisivoy][tablex] = 'E';
-                table[tabley][tablex] = '_';
-            }
-            else{
-                decisivox = tablex + 1;
-                if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
-                    table[tabley][decisivox] = 'E';
-                    table[tabley][tablex] = '_';
-                }
-            }
-        }   
-        else if(deltay < 0 && deltax > 0){ //baixo esquerda
-            decisivoy = tabley + 1;
-            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
-                table[decisivoy][tablex] = 'E';
-                table[tabley][tablex] = '_';
-            }
-            else{
-                decisivox = tablex - 1;
-                if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
-                    table[tabley][decisivox] = 'E';
-                    table[tabley][tablex] = '_';
-                }
-            }
-        }
-        else if(deltay < 0 && deltax < 0){ //baixo direita
-            decisivoy = tabley + 1;
-            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
-                table[decisivoy][tablex] = 'E';
-                table[tabley][tablex] = '_';
-            }
-            else{
-                decisivox = tablex + 1;
-                if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
-                    table[tabley][decisivox] = 'E';
-                    table[tabley][tablex] = '_';
-                }
-            }
-        }   
-        else if(deltay > 1 && deltax == 0){ // cima
-            decisivoy = tabley - 1;
-            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
-                table[decisivoy][tablex] = 'E';
-                table[tabley][tablex] = '_';
-            }
-            else{
-                decisivox = tablex - 1;
-                if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
-                    table[tabley][decisivox] = 'E';
-                    table[tabley][tablex] = '_';
-                }
-                else{
-                    decisivox = tablex + 2;
-                    if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
-                        table[tabley][decisivox] = 'E';
-                        table[tabley][tablex] = '_';
+    for(int i = 0; i < tamtabley; i++){
+        for(int j = 0; j < tamtablex; j++){
+            if(table[i][j] == 'E'){
+                /*
+                 for (int i = 0; i < tamtabley; i++) {
+                        printf("\n");
+                        for (int j = 0; j < tamtablex; j++) {
+                            printf("%c", table[i][j]);
+                            if(table[i][j] == '*')
+                                table[i][j] = '_';
+                        }
                     }
-                }
-            }
-        }   
-        else if(deltay < -1 && deltax == 0){ // baixo
-            decisivoy = tabley + 1;
-            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
-                table[decisivoy][tablex] = 'E';
-                table[tabley][tablex] = '_';
-            }
-            else{
-                decisivox = tablex - 1;
-                if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
-                    table[tabley][decisivox] = 'E';
-                    table[tabley][tablex] = '_';
-                }
-                else{
-                    decisivox = tablex + 2;
-                    if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
-                        table[tabley][decisivox] = 'E';
-                        table[tabley][tablex] = '_';
-                    }
-                }
-            }
-        }   
-        else if(deltay == 0 && deltax > 1){ // esquerda
-            decisivox = tablex - 1;
-            if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
-                table[tabley][decisivox] = 'E';
-                table[tabley][tablex] = '_';
-            }
-            else{
-                decisivoy = tabley + 1;
-                if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
-                    table[decisivoy][tablex] = 'E';
-                    table[tabley][tablex] = '_';
-                }
-                else{
-                    decisivoy = tabley - 2;
-                    if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
-                        table[decisivoy][tablex] = 'E';
-                        table[tabley][tablex] = '_';
-                    }
-                }
-            }
-        }   
-        else if(deltay == 0 && deltax < -1){ // direita
-            decisivox = tablex + 1;
-            if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E'){
-                table[tabley][decisivox] = 'E';
-                table[tabley][tablex] = '_';
-            }
-            else{
-                decisivoy = tabley + 1;
-                if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
-                    table[decisivoy][tablex] = 'E';
-                    table[tabley][tablex] = '_';
-                }
-                else{
-                    decisivoy = tabley - 2;
-                    if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E'){
-                        table[decisivoy][tablex] = 'E';
-                        table[tabley][tablex] = '_';
-                    }
-                }
-            }
-        }
-        
-        if(deltax > -2 && deltax < 2 && deltay == 0)
-            (*vida)--;
-        if(deltay > -2 && deltay < 2 && deltax == 0)
-            (*vida)--;
-    }
+                 */
+                int tablex = j;
+                int tabley = i;
+                int deltay = tabley - coordy;
+                int deltax = tablex - coordx;
 
+                if(deltay > 0 && deltax > 0){ //cima esquerda
+                    decisivoy = tabley - 1;
+                    if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E' && table[decisivoy][tablex] != 'e'){
+                        table[decisivoy][tablex] = 'e';
+                        table[tabley][tablex] = '_';
+                    }
+                    else{
+                        decisivox = tablex - 1;
+                        if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E' && table[tabley][decisivox] != 'e'){
+                            table[tabley][decisivox] = 'e';
+                            table[tabley][tablex] = '_';
+                        }
+                    }
+                }
+                else if(deltay > 0 && deltax < 0){ //cima direita
+                    decisivoy = tabley - 1;
+                    if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E' && table[decisivoy][tablex] != 'e'){
+                        table[decisivoy][tablex] = 'e';
+                        table[tabley][tablex] = '_';
+                    }
+                    else{
+                        decisivox = tablex + 1;
+                        if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E' && table[tabley][decisivox] != 'e'){
+                            table[tabley][decisivox] = 'e';
+                            table[tabley][tablex] = '_';
+                        }
+                    }
+                }   
+                else if(deltay < 0 && deltax > 0){ //baixo esquerda
+                    decisivoy = tabley + 1;
+                    if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E' && table[decisivoy][tablex] != 'e'){
+                        table[decisivoy][tablex] = 'e';
+                        table[tabley][tablex] = '_';
+                    }
+                    else{
+                        decisivox = tablex - 1;
+                        if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E' && table[tabley][decisivox] != 'e'){
+                            table[tabley][decisivox] = 'e';
+                            table[tabley][tablex] = '_';
+                        }
+                    }
+                }
+                else if(deltay < 0 && deltax < 0){ //baixo direita
+                    decisivoy = tabley + 1;
+                    if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E' && table[decisivoy][tablex] != 'e'){
+                        table[decisivoy][tablex] = 'e';
+                        table[tabley][tablex] = '_';
+                    }
+                    else{
+                        decisivox = tablex + 1;
+                        if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E' && table[tabley][decisivox] != 'e'){
+                            table[tabley][decisivox] = 'e';
+                            table[tabley][tablex] = '_';
+                        }
+                    }
+                }   
+                else if(deltay > 1 && deltax == 0){ // cima
+                    decisivoy = tabley - 1;
+                    if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E' && table[decisivoy][tablex] != 'e'){
+                        table[decisivoy][tablex] = 'e';
+                        table[tabley][tablex] = '_';
+                    }
+                    else{
+                        decisivox = tablex - 1;
+                        if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E' && table[tabley][decisivox] != 'e'){
+                            table[tabley][decisivox] = 'e';
+                            table[tabley][tablex] = '_';
+                        }
+                        else{
+                            decisivox = tablex + 1;
+                            if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E' && table[tabley][decisivox] != 'e'){
+                                table[tabley][decisivox] = 'e';
+                                table[tabley][tablex] = '_';
+                            }
+                        }
+                    }
+                }   
+                else if(deltay < -1 && deltax == 0){ // baixo
+                    decisivoy = tabley + 1;
+                    if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E' && table[decisivoy][tablex] != 'e'){
+                        table[decisivoy][tablex] = 'e';
+                        table[tabley][tablex] = '_';
+                    }
+                    else{
+                        decisivox = tablex - 1;
+                        if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E' && table[tabley][decisivox] != 'e'){
+                            table[tabley][decisivox] = 'e';
+                            table[tabley][tablex] = '_';
+                        }
+                        else{
+                            decisivox = tablex + 1;
+                            if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E' && table[tabley][decisivox] != 'e'){
+                                table[tabley][decisivox] = 'e';
+                                table[tabley][tablex] = '_';
+                            }
+                        }
+                    }
+                }   
+                else if(deltay == 0 && deltax > 1){ // esquerda
+                    decisivox = tablex - 1;
+                    if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E' && table[tabley][decisivox] != 'e'){
+                        table[tabley][decisivox] = 'e';
+                        table[tabley][tablex] = '_';
+                    }
+                    else{
+                        decisivoy = tabley + 1;
+                        if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E' && table[decisivoy][tablex] != 'e'){
+                            table[decisivoy][tablex] = 'e';
+                            table[tabley][tablex] = '_';
+                        }
+                        else{
+                            decisivoy = tabley - 1;
+                            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E' && table[decisivoy][tablex] != 'e'){
+                                table[decisivoy][tablex] = 'e';
+                                table[tabley][tablex] = '_';
+                            }
+                        }
+                    }
+                }   
+                else if(deltay == 0 && deltax < -1){ // direita
+                    decisivox = tablex + 1;
+                    if(table[tabley][decisivox] != 'K' && table[tabley][decisivox] != 'X' && table[tabley][decisivox] != 'E' && table[tabley][decisivox] != 'e'){
+                        table[tabley][decisivox] = 'e';
+                        table[tabley][tablex] = '_';
+                    }
+                    else{
+                        decisivoy = tabley + 1;
+                        if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E' && table[decisivoy][tablex] != 'e'){
+                            table[decisivoy][tablex] = 'e';
+                            table[tabley][tablex] = '_';
+                        }
+                        else{
+                            decisivoy = tabley - 1;
+                            if(table[decisivoy][tablex] != 'K' && table[decisivoy][tablex] != 'X' && table[decisivoy][tablex] != 'E' && table[decisivoy][tablex] != 'e'){
+                                table[decisivoy][tablex] = 'e';
+                                table[tabley][tablex] = '_';
+                            }
+                        }
+                    }
+                }
+
+                if(deltax > -2 && deltax < 2 && deltay == 0)
+                    (*vida)--;
+                if(deltay > -2 && deltay < 2 && deltax == 0)
+                    (*vida)--;
+            }
+        }
+    }
 
     // deltay+ deltax+      deltay+ deltax=      deltay+ deltax-
     // deltay= deltax+             E             deltay= deltax-
@@ -694,7 +707,6 @@ int main() {
     int varrepeat = 1; //para o laço de repetição do while
     int hithead = 0; //caso o player tente se mecher em um lugar que não consiga se mecher
     int shooteded = 0; //para saber se atirou ou não
-    inimigo *vetorinimigo;
     
     int mapacoordx = 0; //inicialização do mapa em x=0
     int mapacoordy = 0; //inicialização do mapa em y=0
@@ -816,21 +828,17 @@ int main() {
             shooteded = 0;
 
             printapontosecoords(&pontos, coordx, coordy, mododev);
-
-            int quantinimigo = 0;
             
             for (int i = 0; i < tamtabley; i++) {
                 printf("\n");
                 for (int j = 0; j < tamtablex; j++) {
+                    if(table[i][j] == 'e')
+                        table[i][j] = 'E';
                     printf("%c", table[i][j]);
                     if(table[i][j] == '*' /*& rand()%5 == 0 || rand()%5 == 1*/)
                         table[i][j] = '_';
-                    if(table[i][j] == 'E')
-                        quantinimigo++;
                 }
             }
-            
-            vetorinimigo = (inimigo*) malloc(quantinimigo * sizeof(inimigo));
             
             printavida(&vida, maxvida);
             printabalas(sexpistols);
@@ -844,16 +852,13 @@ int main() {
             int quanti = 0;
             for (int i = 0; i < tamtabley; i++) {
                 for (int j = 0; j < tamtablex; j++) {
-                    if(table[i][j] == 'E'){
-                        vetorinimigo[quanti].y = i;
-                        vetorinimigo[quanti].x = j;
+                    if(table[i][j] == 'E')
                         quanti++;
-                    }
                 }
             }
             
             if(quanti != 0)
-                movinimigo(table, coordy, coordx, vetorinimigo, quantinimigo, &vida);
+                movinimigo(table, coordy, coordx, tamtabley, tamtablex, &vida);
             
             if (coordy == tamtabley-1 || coordy == 0 || coordx == tamtablex-1 || coordy == 0){
                 varrepeat = 0;
